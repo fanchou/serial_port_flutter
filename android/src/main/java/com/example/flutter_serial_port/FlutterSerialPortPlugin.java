@@ -47,7 +47,7 @@ public class FlutterSerialPortPlugin implements MethodCallHandler, EventChannel.
             return;
           size = mInputStream.read(buffer);
           // Log.d(TAG, "read size: " + String.valueOf(size));
-          if (size > 0) {
+          if (buffer != null && size > 0) {
             onDataReceived(buffer, size);
           }
         } catch (IOException e) {
@@ -64,7 +64,12 @@ public class FlutterSerialPortPlugin implements MethodCallHandler, EventChannel.
         @Override
         public void run() {
           // Log.d(TAG, "eventsink: " + buffer.toString());
-          mEventSink.success(Arrays.copyOfRange(buffer, 0, size));
+          try{
+            Arrays.copyOfRange(buffer, 0, size);
+            mEventSink.success(Arrays.copyOfRange(buffer, 0, size));
+          }catch (Exception e){
+            e.printStackTrace();
+          }
         }
       });
     }
@@ -162,8 +167,23 @@ public class FlutterSerialPortPlugin implements MethodCallHandler, EventChannel.
   }
 
   private Boolean closeDevice() {
+    
+    // 先中断线程
+    if (this.mReadThread != null) {
+      this.mReadThread.interrupt();
+    }
+
+    // 关闭输出流
+    if (mOutputStream != null) {
+      try {
+        mOutputStream.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+
     if (mSerialPort != null) {
-      mSerialPort.close();
+      // mSerialPort.close();
       mSerialPort = null;
       return true;
     }
