@@ -18,8 +18,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   TextEditingController _dataController = TextEditingController();
   ScrollController _scrollController = ScrollController();
-  SerialPort _serialPort;
-  StreamSubscription _subscription;
+  SerialPort? _serialPort;
+  StreamSubscription? _subscription;
   bool isPortOpened = false;
   bool isHexMode = false;
   List<Widget> _historyData = [];
@@ -95,30 +95,32 @@ class _HomePageState extends State<HomePage> {
                   Column(
                     children: <Widget>[
                       store.device != null
-                          ? Text("${store.device.name} , ${store.device.path}")
+                          ? Text(
+                              "${store.device!.name} , ${store.device!.path}")
                           : Text("Please select device"),
                       Text("Baudrate: ${store.baudrate}"),
                       Row(
                         children: <Widget>[
-                          RaisedButton(
+                          ElevatedButton(
                             child: !isPortOpened ? Text("Open") : Text("Close"),
                             onPressed: store.device != null
                                 ? () async {
                                     final debounceTransformer =
                                         StreamTransformer<Uint8List,
                                                 dynamic>.fromBind(
-                                            (s) => s.transform(debounceBuffer(
+                                            (s) => s.debounceBuffer(
                                                 const Duration(
-                                                    milliseconds: 500))));
+                                                    milliseconds: 500)));
                                     if (!isPortOpened) {
                                       var serialPort = await FlutterSerialPort
-                                          .createSerialPort(store.device, store.baudrate);
+                                          .createSerialPort(
+                                              store.device!, store.baudrate);
                                       bool openResult = await serialPort.open();
                                       setState(() {
                                         _serialPort = serialPort;
                                         isPortOpened = openResult;
                                       });
-                                      _subscription = _serialPort.receiveStream
+                                      _subscription = _serialPort!.receiveStream
                                           .transform(debounceTransformer)
                                           .listen((recv) {
                                         print("Receive: $recv");
@@ -132,7 +134,7 @@ class _HomePageState extends State<HomePage> {
                                       print("openResult: $openResult");
                                     } else {
                                       bool closeResult =
-                                          await _serialPort.close();
+                                          await _serialPort!.close();
                                       setState(() {
                                         _serialPort = null;
                                         isPortOpened = !closeResult;
@@ -144,15 +146,18 @@ class _HomePageState extends State<HomePage> {
                                 : null,
                           ),
                           SizedBox(width: 8.0),
-                          RaisedButton(
+                          ElevatedButton(
                             child: Text("Send"),
                             onPressed: store.device != null
                                 ? () {
-                                    var sentData = formatSentData(_dataController.text);
+                                    var sentData =
+                                        formatSentData(_dataController.text);
                                     print("Send: $sentData");
-                                    _serialPort.write(Uint8List.fromList(sentData));
+                                    _serialPort!
+                                        .write(Uint8List.fromList(sentData));
                                     setState(() {
-                                      _historyData.add(Text("<<< ${_dataController.text}"));
+                                      _historyData.add(
+                                          Text("<<< ${_dataController.text}"));
                                     });
                                   }
                                 : null,
@@ -162,16 +167,16 @@ class _HomePageState extends State<HomePage> {
                       Row(
                         children: <Widget>[
                           Checkbox(
-                            onChanged: (bool value) {
+                            onChanged: (bool? value) {
                               setState(() {
-                                isHexMode = value;
+                                isHexMode = value!;
                               });
                             },
                             value: isHexMode,
                           ),
                           Text("Hex"),
                           SizedBox(width: 16.0),
-                          RaisedButton(
+                          ElevatedButton(
                             child: Text("Clear"),
                             onPressed: () {
                               setState(() {
