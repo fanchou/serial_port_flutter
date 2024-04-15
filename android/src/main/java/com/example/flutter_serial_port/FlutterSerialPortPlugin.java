@@ -207,8 +207,14 @@ public class FlutterSerialPortPlugin implements FlutterPlugin, MethodCallHandler
 
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-    channel.setMethodCallHandler(null);
-    eventChannel.setStreamHandler(null);
+    if(channel != null) {
+      channel.setMethodCallHandler(null);
+      channel = null;
+    }
+    if(eventChannel != null) {
+      eventChannel.setStreamHandler(null);
+      eventChannel = null;
+    }
 
   }
 }
