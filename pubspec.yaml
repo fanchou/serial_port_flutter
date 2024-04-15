@@ -1,6 +1,6 @@
 name: serial_port_flutter
 description: A Flutter plugin integrated with Android-SerialPort-API, for connecting real device by serial port.
-version: 0.1.1
+version: 0.1.2
 author: Bobson Lin <bobson801104@gmail.com>
 homepage: https://github.com/BbsonLin/flutter_serial_port
 
