@@ -3,8 +3,8 @@ version '1.0'
 
 buildscript {
     repositories {
-        google()
         mavenCentral()
+        jcenter() // For backward compatibility
         maven { url 'https://jitpack.io' }
     }
 
@@ -15,8 +15,8 @@ buildscript {
 
 rootProject.allprojects {
     repositories {
-        google()
         mavenCentral()
+        jcenter() // For backward compatibility
         maven { url 'https://jitpack.io' }
     }
 }
